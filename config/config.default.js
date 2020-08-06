@@ -6,11 +6,11 @@
  * @property {String} SOME_KEY - some description
  */
 exports.mqtt = {
-  host: 'mqtt://10.1.60.72',
+  host: 'mqtt://xxx.xxx.x.x',
   port: 1883,
-  username: '9YK8J8U9spGsBFHe6Ksibg',
-  password: 'SZiwACdaa7ssqbnY',
-  clientId: 'MQTT_FX_Client10773',
+  username: 'username',
+  password: 'password',
+  clientId: 'client_id',
   options: {
     keeplive: 60,
     protocolId: 'MQTT',
@@ -21,7 +21,10 @@ exports.mqtt = {
     reconnectPeriod: 1000,
     connectTimeout: 30 * 1000,
   },
-  topics: {
-    '8Gt3vrDPkasCUg5Xkw6gwv/8Y9sRPejJypA647ddwAY7i/boat/notify': { qos: 0 },
-  },
+
+  DataBus: true,
+
+  // topics: {
+  //   'topic-topic-topic': { qos: 0 },
+  // },
 };

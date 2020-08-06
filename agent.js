@@ -18,15 +18,18 @@ class AppBootHook {
 
   async serverDidReady() {
 
-    // 订阅
-    await this.agent.mqtt.subscribe({ ...this.agent.config.mqtt.topics }, function(err, granted) {
-      console.log(granted);
-    });
+    // 通过配置直接订阅
+    if (this.agent.config.mqtt.topics) {
+      await this.agent.mqtt.subscribe({ ...this.agent.config.mqtt.topics }, function(err, granted) {
+        console.log(granted);
+      });
+    }
 
-    // 检查是否存在指定的文件，不存在就创建
-    if (!fs.existsSync('./app/mqtt/subscribeMessage.js')) {
+
+    // 检查是否需要统一的数据出口，需要存在指定的文件，不存在就创建
+    if (this.agent.config.mqtt.DataBus && !fs.existsSync('./app/mqtt/DataBus.js')) {
       fs.mkdirSync('./app/mqtt');
-      const subscribeMessage = fs.readFileSync('./node_modules/egg-mqtt-plugin/lib/subscribeMessage.js', 'utf8');
+      const subscribeMessage = fs.readFileSync('./node_modules/egg-mqtt-plugin/lib/DataBus.js', 'utf8');
       fs.writeFileSync('./app/mqtt/subscribeMessage.js', subscribeMessage);
     }
 
@@ -43,6 +46,24 @@ class AppBootHook {
     this.agent.messenger.on('mqtt-publish', data => {
       this.agent.mqtt.publish(data.topic, data.message, data.options, err => {
         this.agent.logger.coreLogger.error('[egg-mqtt-plugin] publish error : %s', err);
+      });
+    });
+
+    // 注册mqtt的subscribe事件
+    this.agent.messenger.on('mqtt-subscribe', data => {
+      this.agent.mqtt.subscribe(data, (err, granted) => {
+        if (err) {
+          this.agent.logger.coreLogger.error('[egg-mqtt-plugin] subscribe error : %s', err);
+          return;
+        }
+        this.agent.logger.coreLogger.info('[egg-mqtt-plugin] subscribe succese : %s', granted);
+      });
+    });
+
+    // 注册mqtt的unsubscribe事件
+    this.agent.messenger.on('mqtt-unsubscribe', data => {
+      this.agent.mqtt.unsubscribe(data.topic, data.options, err => {
+        this.agent.logger.coreLogger.error('[egg-mqtt-plugin] unsubscribe error : %s', err);
       });
     });
   }

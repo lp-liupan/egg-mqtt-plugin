@@ -8,11 +8,15 @@ class AppBootHook {
   }
 
   async serverDidReady() {
-    const src = path.join(__dirname, '../../app/mqtt/subscribeMessage.js');
-    this.app.messenger.on('mqtt-subscribe', data => {
-      console.log('数据进入');
-      (require(src))(data);
-    });
+
+    if (this.app.config.mqtt.DataBus) {
+      const src = path.join(__dirname, '../../app/mqtt/DataBus.js');
+      this.app.messenger.on('mqtt-subscribe', data => {
+        this.app.logger.coreLogger.error('[egg-mqtt-plugin] send to worker DataBus success!');
+        (require(src))(data);
+      });
+    }
+
   }
 }
 
