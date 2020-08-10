@@ -45,7 +45,7 @@ class AppBootHook {
     // 注册mqtt的publish事件
     this.agent.messenger.on('mqtt-publish', data => {
       this.agent.mqtt.publish(data.topic, data.message, data.options, err => {
-        this.agent.logger.coreLogger.error('[egg-mqtt-plugin] publish error : %s', err);
+        this.agent.coreLogger.error('[egg-mqtt-plugin] publish error : %s', err);
       });
     });
 
@@ -53,17 +53,17 @@ class AppBootHook {
     this.agent.messenger.on('mqtt-subscribe', data => {
       this.agent.mqtt.subscribe(data, (err, granted) => {
         if (err) {
-          this.agent.logger.coreLogger.error('[egg-mqtt-plugin] subscribe error : %s', err);
+          this.agent.coreLogger.error('[egg-mqtt-plugin] subscribe error : %s', err);
           return;
         }
-        this.agent.logger.coreLogger.info('[egg-mqtt-plugin] subscribe succese : %s', granted);
+        this.agent.coreLogger.info('[egg-mqtt-plugin] subscribe succese : %s', granted);
       });
     });
 
     // 注册mqtt的unsubscribe事件
     this.agent.messenger.on('mqtt-unsubscribe', data => {
       this.agent.mqtt.unsubscribe(data.topic, data.options, err => {
-        this.agent.logger.coreLogger.error('[egg-mqtt-plugin] unsubscribe error : %s', err);
+        this.agent.coreLogger.error('[egg-mqtt-plugin] unsubscribe error : %s', err);
       });
     });
   }
