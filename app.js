@@ -13,7 +13,7 @@ class AppBootHook {
       const src = path.join(__dirname, '../../app/mqtt/DataBus.js');
       this.app.messenger.on('mqtt-subscribe', data => {
         this.app.coreLogger.info('[egg-mqtt-plugin] send to worker DataBus success!');
-        (require(src))(data);
+        (require(src))(this.app, data);
       });
     }
 
