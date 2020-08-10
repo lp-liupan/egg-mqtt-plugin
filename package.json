@@ -1,7 +1,7 @@
 {
   "name": "egg-mqtt-plugin",
-  "version": "0.0.1",
-  "description": "mqtt-client for egg  for egg",
+  "version": "1.0.3",
+  "description": "mqtt-client for egg. 使用mqtt包封装的egg客户端插件",
   "private": false,
   "eggPlugin": {
     "name": "mqtt"
