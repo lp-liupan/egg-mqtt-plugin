@@ -30,7 +30,7 @@ class AppBootHook {
     if (this.agent.config.mqtt.DataBus && !fs.existsSync('./app/mqtt/DataBus.js')) {
       fs.mkdirSync('./app/mqtt');
       const subscribeMessage = fs.readFileSync('./node_modules/egg-mqtt-plugin/lib/DataBus.js', 'utf8');
-      fs.writeFileSync('./app/mqtt/DataBus.js.js', subscribeMessage);
+      fs.writeFileSync('./app/mqtt/DataBus.js', subscribeMessage);
     }
 
 
