@@ -21,7 +21,11 @@ class AppBootHook {
     // 通过配置直接订阅
     if (this.agent.config.mqtt.topics) {
       await this.agent.mqtt.subscribe({ ...this.agent.config.mqtt.topics }, function(err, granted) {
-        console.log(granted);
+        if (err) {
+          this.agent.coreLogger.error('[egg-mqtt-plugin] subscribe err : %s', err);
+          return;
+        }
+        this.agent.coreLogger.info('[egg-mqtt-plugin] subscribe success : %s', granted);
       });
     }
 
