@@ -28,9 +28,11 @@ class AppBootHook {
 
     // 检查是否需要统一的数据出口，需要存在指定的文件，不存在就创建
     if (this.agent.config.mqtt.DataBus && !fs.existsSync('./app/mqtt/DataBus.js')) {
-      fs.mkdirSync('./app/mqtt');
-      const subscribeMessage = fs.readFileSync('./node_modules/egg-mqtt-plugin/lib/DataBus.js', 'utf8');
-      fs.writeFileSync('./app/mqtt/DataBus.js', subscribeMessage);
+      if (!fs.existsSync('./app/mqtt')) {
+        fs.mkdirSync('./app/mqtt');
+      }
+      const DataBus = fs.readFileSync('./node_modules/egg-mqtt-plugin/lib/DataBus.js', 'utf8');
+      fs.writeFileSync('./app/mqtt/DataBus.js', DataBus);
     }
 
 
