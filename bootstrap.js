@@ -19,6 +19,12 @@ class Mqtt {
     this.app.messenger.sendToAgent('mqtt-unsubscribe', data);
   }
 
+  message(callback) {
+    this.app.messenger.on('mqtt-subscribe', data => {
+      callback(data.topic, data.message);
+    });
+  }
+
 }
 
 module.exports = Mqtt;
