@@ -16,7 +16,7 @@ class AppBootHook {
   }
 
 
-  async didReady() {
+  async serverDidReady() {
 
     // 通过配置直接订阅
     if (this.agent.config.mqtt.topics) {
