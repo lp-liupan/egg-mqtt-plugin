@@ -1,6 +1,6 @@
 {
   "name": "egg-mqtt-plugin",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "mqtt-client for egg. 使用mqtt包封装的egg客户端插件",
   "private": false,
   "eggPlugin": {
@@ -51,12 +51,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eggjs/egg-mqtt-plugin.git"
+    "url": "git+https://github.com/lp-liupan/egg-mqtt-plugin.git"
   },
   "bugs": {
-    "url": "https://github.com/eggjs/egg/issues"
+    "url": "https://github.com/lp-liupan/egg-mqtt-plugin/issues"
   },
-  "homepage": "https://github.com/eggjs/egg-mqtt-plugin#readme",
+  "homepage": "https://github.com/lp-liupan/egg-mqtt-plugin",
   "author": "liupan",
   "license": "MIT"
 }
