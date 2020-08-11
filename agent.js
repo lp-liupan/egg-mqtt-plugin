@@ -59,7 +59,7 @@ class AppBootHook {
 
     // 注册mqtt的subscribe事件
     this.agent.messenger.on('mqtt-subscribe', data => {
-      this.agent.mqtt.subscribe(data, (err, granted) => {
+      this.agent.mqtt.subscribe(data.topic, data.options, (err, granted) => {
         if (err) {
           this.agent.coreLogger.error('[egg-mqtt-plugin] subscribe error : %s', err);
           return;

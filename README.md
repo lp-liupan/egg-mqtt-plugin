@@ -27,7 +27,7 @@
 
 egg-mqtt-plugin 版本 | egg 2.x
 --- | ---
-0.0.1 | 😁
+1.x | 😁
 0.x | ❌
 
 
@@ -54,8 +54,22 @@ config.mqtt = {
   // DataBus: true,
 }
 ```
+    
 
-## 详细配置
+[详细配置](#config)    
+[插件介绍](#info)    
+[插件的使用](#use)   
+[插件的使用.建立链接](#use-link)    
+[插件的使用.发布](#use-publish)    
+[插件的使用.订阅](#use-subscribe)   
+[插件的使用.取消订阅](#use-unsubscribe)   
+[插件的使用.监听订阅消息](#use-message)   
+[Mqtt类](#mqtt)   
+[示例](#example)   
+[issue](#issue)   
+[license](#license)   
+
+## <span id="config">详细配置</span>
 
 请到 [config/config.default.js](config/config.default.js) 查看详细配置项说明。
 
@@ -75,7 +89,7 @@ config.mqtt = {
 
 
 
-## 插件介绍
+## <span id="info">插件介绍</span>
 
   使用过一些mqtt插件，发现并不能满足业务开发的需求。有的插件在生产环境和多进程环境下无法使用，为了能够在多进程下使用mqtt客户端并且能够有一个比较舒服的使用方式。     
 
@@ -84,32 +98,17 @@ config.mqtt = {
   mqtt实例运行在agent进程上，所以在work进程上无法对mqtt实例进行操作，`egg-mqtt-plugin`提供了统一数据出口(需要开启`DataBus`)和Mqtt类。
 
 
-## 插件的使用
+## <span id="use">插件的使用</span>
 
-### 统一的数据出口DataBus
+> 插件暂时没有提供publish、subscribe、unsubscribe等方法的回调函数，后续版本会实现。
 
+### <span id="use-link">建立链接</span>
 
-插件默认开启了此功能，可以通过配置文件中的`DataBus:false`选项进行关闭。     
+开启插件并填写好相关配置，在框架启动的时候时候会自动进行mqtt链接。
 
-开启此功能后，可以手动创建/app/mqtt/DataBus.js文件，如果没有创建插件在运行的时候会自动创建。
+### <span id="use-publish">发布</span>
 
-```js
-'use strict';
-
-// /app/mqtt/DataBus.js
-
-module.exports = async data => {
-  console.log('收到数据');
-  console.log(data.topic);
-};
-
-```
-
-### 配置topics
-
-可以在在配置选项`topics`中传入相应的topic和参数，插件会在启动后直接进行订阅相关topic。如果同时开启了DataBus功能，订阅后获取到的数据会直接传入DataBus.js中。
-
-### 发布消息
+> 发布方法暂时没有提供回调函数，因为多进程的原因最好在controller（请求生命周期）中或者agent中调用，如果其他地方使用会出现重复发布的情况。
 
 消息的发布需要使用Mqtt实例，调用Mqtt实例的`publish()`方法即可。
 
@@ -124,23 +123,20 @@ const Mqtt = require('egg-mqtt-start/bootstrap');
 
 const mqtt = new Mqtt(this.app);
 
-const data = {
-  topic: '',
-  message: '',
-  options:{},
-}
+const topic = 'xxx-xxx-xxx';
+const message = '这是我要发布的信息';
+const options = { qos: 0 };
 
-mqtt.publish(data);
+mqtt.publish(topic, message, options);
 
 ```
 
-### 手动订阅和取消订阅
+### <span id="use-subscribe">订阅</span>
 
-手动订阅和取消订阅操作与发布操作相同，同样的需要引入Mqtt类，实例化后调用其`subscribe()`和`unsubscribe()`。
+> 订阅方法暂时没有提供回调函数，后续版本会实现订阅后的回调。
 
-Mqtt类由 'egg-mqtt-start/bootstrap.js'文件暴露出来，实例化Mqtt的时候需要使用`app`作为参数。
+订阅有两种方式，一种是通过config.default.js配置文件中`topics`参数进行配置，另一种是手动调用`subscribe()`方法。更详细的参数可以参考[mqtt.subscribe()文档](https://www.npmjs.com/package/mqtt#connect)。
 
-subscribe()和unsubscribe()方法需要传入一个对象参数，其中包括topic、options等信息，更详细的参数可以参考[mqtt.subscribe()文档](https://www.npmjs.com/package/mqtt#connect)。
 
 ```js
 'use strict';
@@ -149,22 +145,99 @@ const Mqtt = require('egg-mqtt-start/bootstrap');
 
 const mqtt = new Mqtt(this.app);
 
-const data = {
-  topic: '',
-  options:{},
-}
+const topic = 'xxx-xxx-xxx';
+const options = { qos: 0 };
 
-mqtt.subscribe(data);
+mqtt.subscribe(topic, options);
 
 ```
 
-## 示例
+
+### <span id="use-unsubscribe">取消订阅</span>
+
+取消订阅直接调用`Mqtt`类的`unsubscribe()`方法就可以了。
+
+```js
+const Mqtt = require('egg-mqtt-start/bootstrap');
+
+const mqtt = new Mqtt(this.app);
+
+const topic = 'xxx-xxx-xxx';
+const options = { qos: 0 };
+
+mqtt.unsubscribe(topic, options);;
+
+```
+
+### <span id="use-message">监听订阅消息</span>
+
+获取订阅的消息有两种方式，一种是开启`config.default.js`配置文件中`DataBus:true`选项（默认开启），订阅的所有消息和`app`都会统一的被发送到`/app/mqtt/DataBus.js`文件中，
+开启此功能后`DataBus.js`文件会在项目启动后自动创建，也可以自己手动创建，格式如下例子：
+
+```js
+'use strict';
+
+// /app/mqtt/DataBus.js
+
+module.exports = async (app, data) => {
+  console.log('收到数据');
+  console.log(data.topic);
+};
+
+```
+
+另一种获取订阅的消息的方式是调用`message()`方法，需要传入一个回调函数，插件会将`topic`和相应的消息信息传入回调函数的参数中。
+
+```js
+
+const Mqtt = require('egg-mqtt-plugin/bootstrap');
+
+const mqtt = new Mqtt(this.app);
+
+mqtt.message((topic, message) => {
+  console.log(topic);
+})
+
+```
 
 
-## 提问交流
+## <span id="Mqtt">Mqtt类</span>
 
-请到 [egg issues](https://github.com/eggjs/egg/issues) 异步交流。
+`egg-mqtt-plugin`是基于`mqtt.js`进行封装并且是在`agent`进程上进行实例化的，所以在我们的业务代码中，无法使用`mqtt.js`实例提供的相应的方法，为了保证正常的时候用，
+`egg-mqtt-plugin`通过`bootstrap.js`文件导出一个`Mqtt`类，在这个类中通过进程间通讯间接的实现了`mqtt.js`实例上的部分方法。目前的版本暂时没有显示部分方法的回调函数功能。
 
-## License
+```js
+
+const Mqtt = require('egg-mqtt-plugin/bootstrap');
+
+// 获取mqtt实例的时候需要传入当前环境下的app对象
+cosnt mqtt = new Mqtt(this.app);
+
+// 发布
+mqtt.publish('topic', '我是发布的消息体', { qos: 0 });
+
+// 订阅
+mqtt.subscribe('topic', { qos: 0 });
+
+// 取消订阅
+mqtt.unsubscribe('topic', { qos: 0 });
+
+// 监听消息
+mqtt.message((topic, message) => {
+  console.log(topic);
+});
+
+
+```
+
+
+## <span id="example">示例</span>
+
+
+## <span id="issues">提问交流</span>
+
+请到 [egg issues](https://github.com/lp-liupan/egg-mqtt-plugin/issues) 异步交流。
+
+## <span id="license">License</span>
 
 [MIT](LICENSE)

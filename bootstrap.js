@@ -7,15 +7,18 @@ class Mqtt {
   }
 
 
-  publish(data) {
+  publish(topic, message, options) {
+    const data = { topic, message, options };
     this.app.messenger.sendToAgent('mqtt-publish', data);
   }
 
-  subscribe(data) {
+  subscribe(topic, options) {
+    const data = { topic, options };
     this.app.messenger.sendToAgent('mqtt-subscribe', data);
   }
 
-  unsubscribe(data) {
+  unsubscribe(topic, options) {
+    const data = { topic, options };
     this.app.messenger.sendToAgent('mqtt-unsubscribe', data);
   }
 
