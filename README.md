@@ -100,7 +100,10 @@ config.mqtt = {
 
 ## <span id="use">插件的使用</span>
 
-> 插件暂时没有提供publish、subscribe、unsubscribe等方法的回调函数，后续版本会实现。
+> 插件得到publish、subscribe、unsubscribe等方法建议在agent.js或者在一个http请求的生命周期（controller、service、middleware、route）中使用。如果在非agent进程和一个http请求的生命周期中使用，多进程
+环境下会导致每个worker进程都调用一次，从而导致了重复调用。这个问题会在后续版本中优化，可以在任何地方调用并且不会导致重复调用的情况。      
+
+获取订阅消息的message()方法不会多次触发，可以在任何地方使用。
 
 ### <span id="use-link">建立链接</span>
 
@@ -108,7 +111,7 @@ config.mqtt = {
 
 ### <span id="use-publish">发布</span>
 
-> 发布方法暂时没有提供回调函数，因为多进程的原因最好在controller（请求生命周期）中或者agent中调用，如果其他地方使用会出现重复发布的情况。
+> 因为多进程的原因最好在一个http请求的生命周期（controller、service、middleware、route）中或者agent中调用，如果其他地方使用会出现重复发布的情况。
 
 消息的发布需要使用Mqtt实例，调用Mqtt实例的`publish()`方法即可。
 
@@ -127,13 +130,15 @@ const topic = 'xxx-xxx-xxx';
 const message = '这是我要发布的信息';
 const options = { qos: 0 };
 
-mqtt.publish(topic, message, options);
+mqtt.publish(topic, message, options, err => {
+  console.log('发布完成');
+});
 
 ```
 
 ### <span id="use-subscribe">订阅</span>
 
-> 订阅方法暂时没有提供回调函数，后续版本会实现订阅后的回调。
+> 因为多进程的原因最好在一个http请求的生命周期（controller、service、middleware、route）中或者agent中调用，如果其他地方使用会出现重复订阅的情况。
 
 订阅有两种方式，一种是通过config.default.js配置文件中`topics`参数进行配置，另一种是手动调用`subscribe()`方法。更详细的参数可以参考[mqtt.subscribe()文档](https://www.npmjs.com/package/mqtt#connect)。
 
@@ -148,7 +153,9 @@ const mqtt = new Mqtt(this.app);
 const topic = 'xxx-xxx-xxx';
 const options = { qos: 0 };
 
-mqtt.subscribe(topic, options);
+mqtt.subscribe(topic, options, (err, granted) => {
+  console.log(granted.topic);
+});
 
 ```
 
@@ -165,7 +172,9 @@ const mqtt = new Mqtt(this.app);
 const topic = 'xxx-xxx-xxx';
 const options = { qos: 0 };
 
-mqtt.unsubscribe(topic, options);;
+mqtt.unsubscribe(topic, options, err => {
+  console.log('取消订阅');
+});;
 
 ```
 
@@ -214,13 +223,13 @@ const Mqtt = require('egg-mqtt-plugin/bootstrap');
 cosnt mqtt = new Mqtt(this.app);
 
 // 发布
-mqtt.publish('topic', '我是发布的消息体', { qos: 0 });
+mqtt.publish('topic', '我是发布的消息体', { qos: 0 }, callback);
 
 // 订阅
-mqtt.subscribe('topic', { qos: 0 });
+mqtt.subscribe('topic', { qos: 0 }, callback);
 
 // 取消订阅
-mqtt.unsubscribe('topic', { qos: 0 });
+mqtt.unsubscribe('topic', { qos: 0 }, callback);
 
 // 监听消息
 mqtt.message((topic, message) => {

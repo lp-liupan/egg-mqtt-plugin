@@ -1,6 +1,6 @@
 {
   "name": "egg-mqtt-plugin",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "mqtt-client for egg. 使用mqtt包封装的egg客户端插件",
   "private": false,
   "eggPlugin": {
@@ -15,7 +15,8 @@
     "egg-plugin"
   ],
   "dependencies": {
-    "mqtt": "^4.1.0"
+    "mqtt": "^4.1.0",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",

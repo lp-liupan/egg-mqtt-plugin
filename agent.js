@@ -54,6 +54,7 @@ class AppBootHook {
     this.agent.messenger.on('mqtt-publish', data => {
       this.agent.mqtt.publish(data.topic, data.message, data.options, err => {
         this.agent.coreLogger.error('[egg-mqtt-plugin] publish error : %s', err);
+        this.agent.messenger.sendTo(data.pid, data.action, err);
       });
     });
 
@@ -65,6 +66,7 @@ class AppBootHook {
           return;
         }
         this.agent.coreLogger.info('[egg-mqtt-plugin] subscribe succese : %s', granted);
+        this.agent.messenger.sendTo(data.pid, data.action, { err, granted });
       });
     });
 
@@ -72,6 +74,7 @@ class AppBootHook {
     this.agent.messenger.on('mqtt-unsubscribe', data => {
       this.agent.mqtt.unsubscribe(data.topic, data.options, err => {
         this.agent.coreLogger.error('[egg-mqtt-plugin] unsubscribe error : %s', err);
+        this.agent.messenger.sendTo(data.pid, data.action, err);
       });
     });
   }
