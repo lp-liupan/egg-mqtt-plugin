@@ -48,7 +48,7 @@ class Mqtt {
 
     // 提供回调函数
     this.app.messenger.once(action, data => {
-      if (data.granted) {
+      if (data && data.granted) {
         callback(data.err, data.granted);
       } else {
         callback(data);
